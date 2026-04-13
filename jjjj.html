@@ -121,6 +121,8 @@
 
                         <div class="row">
                             <div class="col-12">
+                                <div class="card">
+                                    <div class="card-body">
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <h5 class="mb-sm-0 font-size-18">Número de cuenta: {{ account.number }}</h5>
@@ -138,7 +140,7 @@
                             <div class="col-12">
                                 <div class="table-responsive">
                                     <h5>Movimientos</h5>
-                                    <table class="table">
+                                    <table class="table table-hover">
                                         <thead>
                                             
                                                 <th width="25%"><font color="34495e">Fecha</font></th>
@@ -147,7 +149,27 @@
                                                 <th width="15%"><font color="34495e">Tipo</font></th>
                                             
                                         </thead>
-                                    
+                                        <tbody>
+                                        <!-- Filas de transacciones -->
+                                        {% for t in transactions %}
+                                        <tr>
+                                            <td>{{ t.date.strftime('%d/%m/%Y %H:%M') if t.date else 'N/A' }}</td>
+                                            <td>{{ t.description }}</td>
+                                            
+                                            {% if t.type == 1 %}
+                                                <td>+${{ (t.amount) }}</td>
+                                                <td>Ingreso</td>
+                                            {% elif t.type == 2 %}
+                                                <td >-${{(t.amount) }}</td>
+                                                <td >Egreso</td>
+                                            {% endif %}
+                                        </tr>
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="4" align="center">No hay movimientos</td>
+                                        </tr>
+                                        {% endfor %}
+                                        </tbody>
                                     </table>
                                 </div>
                             </div>

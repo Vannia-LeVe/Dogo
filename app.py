@@ -1,5 +1,7 @@
 from flask import Flask,render_template, request, jsonify,redirect,url_for
-from flask_login import LoginManager, login_user, login_required, logout_user
+from flask_login import LoginManager, current_user, login_user, login_required, logout_user
+from entities.transaction import Transaction
+from entities.account import Account
 from entities.user import User
 from dotenv import load_dotenv
 import os
@@ -10,7 +12,7 @@ app.secret_key= os.getenv("SECRET_KEY")
 
 login_manager= LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = "index" 
+login_manager.login_view = "index" # ruta de la pagina de sesión del sistema, punto de entrada 
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -24,7 +26,11 @@ def index():
 @app.route('/welcome')
 @login_required
 def welcome():
-    return render_template('welcome.html')
+     # Obtener la cuenta del usuario usando la clase Account
+    account = Account.get_by_user_id(current_user.id)
+    
+    
+    return render_template('welcome.html', account=account)
 
 @app.route('/signup')
 def signup():
@@ -58,7 +64,7 @@ def login():
 
     user = User.check_login(email, password)
     if user:
-        login_user(user)
+        login_user(user) # lo guarda en cookies
 
         return jsonify({
             "success": True,

@@ -11,7 +11,6 @@ class User(UserMixin): #se esta heredando
         self.email = email
         self.password = password
         
-  
     def check_email_exists(email) -> bool:
         """
             Verifica si la cuenta de correo electrónico ya se encuentra registrada.
