@@ -1,29 +1,43 @@
 import pymysql
+from entities.transaction import Transaction
+from entities.user import User
 from persistence.db import get_connection
+from datetime import datetime
 
 class Account:
-    def __init__(self, id: int, number: str, id_user: int):
+    def __init__(self, id: int, number: str,creation_date:datetime, user: User,transactions: list): # en id_user en la tabla esta como FK 
         self.id = id
         self.number = number
-        self.id_user = id_user
+        self.creation_date=creation_date
+        self.user=user
+        self.transactions=transactions
+        
     
-    @staticmethod
-    def get_by_user_id(id_user: int):
-        """Obtiene la cuenta principal de un usuario"""
+   
+    def get_account_by_id(id_user: int):
         try:
             connection = get_connection()
             cursor = connection.cursor(pymysql.cursors.DictCursor)
             
-            sql = "SELECT id, number, id_user FROM account WHERE id_user = %s "
+            sql = "SELECT id, number,creation_date, id_user FROM account WHERE id_user = %s "
             cursor.execute(sql, (id_user,))
             
-            row = cursor.fetchone()
+            rs = cursor.fetchone()
+            user= User.get_by_id(rs["id_user"])
+            
+            transactions=Transaction.get_transaction_by_account(rs["id_account"])
+            
+            account=Account(
+                rs["id"],
+                rs["number"],
+                rs["creation_date"],
+                user,
+                transactions
+            )
             cursor.close()
             connection.close()
-            
-            if row:
-                return Account(row["id"], row["number"], row["id_user"])
-            return None
+            return account
+        
         except Exception as ex:
             print(f"Error getting account: {ex}")
             return None

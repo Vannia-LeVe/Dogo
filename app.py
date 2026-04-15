@@ -1,7 +1,7 @@
 from flask import Flask,render_template, request, jsonify,redirect,url_for
 from flask_login import LoginManager, current_user, login_user, login_required, logout_user
-from entities.transaction import Transaction
 from entities.account import Account
+from entities.transaction import Transaction
 from entities.user import User
 from dotenv import load_dotenv
 import os
@@ -26,11 +26,8 @@ def index():
 @app.route('/welcome')
 @login_required
 def welcome():
-     # Obtener la cuenta del usuario usando la clase Account
-    account = Account.get_by_user_id(current_user.id)
-    
-    
-    return render_template('welcome.html', account=account)
+    account= Account.get_account_by_id(current_user.id)
+    return render_template('welcome.html',account=account)
 
 @app.route('/signup')
 def signup():
