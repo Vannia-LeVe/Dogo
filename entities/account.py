@@ -25,7 +25,7 @@ class Account:
             rs = cursor.fetchone()
             user= User.get_by_id(rs["id_user"])
             
-            transactions=Transaction.get_transaction_by_account(rs["id_account"])
+            transactions=Transaction.get_transaction_by_account(rs["id"])
             
             account=Account(
                 rs["id"],
@@ -41,3 +41,14 @@ class Account:
         except Exception as ex:
             print(f"Error getting account: {ex}")
             return None
+        
+    def get_saldo(self):
+        """Calcula el saldo actual sumando ingresos y restando egresos"""
+        saldo = 0
+        for transaction in self.transactions:
+            if transaction.type.value == 1:  # Ingreso 
+                saldo += transaction.amount
+            elif transaction.type.value == 2:  # Egreso
+                saldo -= transaction.amount
+        return saldo 
+    

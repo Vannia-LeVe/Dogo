@@ -101,41 +101,45 @@
             </div>
 
             <div class="main-content">
-
                 <div class="page-content">
                     <div class="container-fluid">
-
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                                    <h4 class="mb-sm-0 font-size-18">Bienvenido {{ current_user.name }}</h4>
-                                    <div class="page-title-right">
-                                        <ol class="breadcrumb m-0">
-                                            <li class="breadcrumb-item"><a href="javascript: void(0);">Inicio</a></li>
-                                            <li class="breadcrumb-item active">Página en blanco</li>
-                                        </ol>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                         <div class="row">
                             <div class="col-12">
                                 <div class="card">
                                     <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <h5 class="mb-sm-0 font-size-18">Número de cuenta: {{ account.number }}</h5>
+                                        <div class="row align-items-center">
+                                            
+                                            <div class="col-md-5">
+                                                <div class="d-flex align-items-center">
+                                                    <img class="rounded-circle" src="{{ url_for('static',filename='images/users/default.png') }}" width="70" height="70" style="object-fit: cover; border: 2px solid #e9ecef;">
+                                                    <div class="ms-3">
+                                                        <span class="text-muted">Bienvenido,</span>
+                                                        <h4 class="mb-0">{{ current_user.name }}</h4>
+                                                        
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="col-md-6">
-                                                <h5 class="mb-sm-0 font-size-18 ">Saldo: ${{ '0.00' }}</h5>
+                                            
+                                            <!-- Número de cuenta -->
+                                            <div class="col-md-4">
+                                                <div class="border-start border-end px-4 text-center">
+                                                    <h5 class="mb-0 mt-1">{{ account.number }}</h5>
+                                                    <small class="text-muted">Número de cuenta</small>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Saldo -->
+                                            <div class="col-md-3 text-end">
+                                                <div class="px-3">
+                                                    <small class="text-muted">Saldo actual</small>
+                                                    <h3  "font color="#0a2642">${{ "%.2f"|format(balance) }}</h3>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
                         <div class="row">
                             <div class="col-12">
                                 <div class="table-responsive">
@@ -143,32 +147,42 @@
                                     <table class="table table-hover">
                                         <thead>
                                             
-                                                <th width="25%"><font color="34495e">Fecha</font></th>
-                                                <th width="40%"><font color="34495e">Descripción</font></th>
-                                                <th width="20%"><font color="34495e">Monto</font></th>
-                                                <th width="15%"><font color="34495e">Tipo</font></th>
+                                                <th width="20%"><font color="#34495e">Fecha</font></th>
+                                                <th width="30%"><font color="#34495e">Descripción</font></th>
+                                                <th width="25%"><font color="#34495e">Monto</font></th>
+                                                <th width="25%"><font color="#34495e">Tipo</font></th>
                                             
                                         </thead>
                                         <tbody>
-                                        
-                                        {% for t in transactions %}
+                                        {% for t in account.transactions %}
                                         <tr>
-                                            <td>{{ t.date.strftime('%d/%m/%Y %H:%M') if t.date else 'N/A' }}</td>
+                                            <td>
+                                                {% if t.date %}
+                                                    {% if t.date.strftime is defined %}
+                                                        {{ t.date.strftime('%d/%m/%Y %H:%M') }}
+                                                    {% else %}
+                                                        {{ t.date }}
+                                                    {% endif %}
+                                                {% else %}
+                                                    N/A
+                                                {% endif %}
+                                            </td>
                                             <td>{{ t.description }}</td>
                                             
-                                            {% if t.type == 1 %}
+                                            {% if t.type.value == 1 %}
                                                 <td>+${{ (t.amount) }}</td>
                                                 <td>Ingreso</td>
-                                            {% elif t.type == 2 %}
-                                                <td >-${{(t.amount) }}</td>
-                                                <td >Egreso</td>
+                                            {% elif t.type.value == 2 %}
+                                                <td>-${{(t.amount) }}</td>
+                                                <td>Egreso</td>
                                             {% endif %}
                                         </tr>
-                                        {% else %}
+                                            {% else %}
                                         <tr>
                                             <td colspan="4" align="center">No hay movimientos</td>
                                         </tr>
-                                        {% endfor %}
+                                            {% endfor %}
+
                                         </tbody>
                                     </table>
                                 </div>

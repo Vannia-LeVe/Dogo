@@ -27,7 +27,8 @@ def index():
 @login_required
 def welcome():
     account= Account.get_account_by_id(current_user.id)
-    return render_template('welcome.html',account=account)
+    balance = account.get_saldo() if account else 0
+    return render_template('welcome.html',account=account, balance=balance)
 
 @app.route('/signup')
 def signup():

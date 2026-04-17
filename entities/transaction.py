@@ -1,10 +1,11 @@
 import pymysql
-from enums.transaction_type import TransactionTyoe
+from enums.transaction_type import TransactionType
 from datetime import datetime
 from persistence.db import get_connection
 
 class Transaction:
-    def __init__(self, amount: float, description: str, date:datetime,type:TransactionTyoe):
+    def __init__(self, id:int ,date:datetime  , description: str, amount: float ,type:TransactionType):
+        self.id = id
         self.amount = amount
         self.type = type
         self.description = description
@@ -14,18 +15,29 @@ class Transaction:
         try:
             connection = get_connection()
             cursor = connection.cursor(pymysql.cursors.DictCursor)
-            sql = "SELECT amount, description, date, type FROM transaction WHERE id_account = %s "
+            sql = "SELECT id, amount , description,date, type FROM transaction WHERE id_account = %s "
             cursor.execute(sql, (id_account,)) 
             
+            
             rs = cursor.fetchall()
+            transactions = []
+            for row in rs:
 
-            transactions=Transaction(rs["amount"],rs["description"],rs["date"],rs["type"])
-            transactions.append(transactions)
+                transaction_Type = TransactionType(row["type"])
+              
+                transaction = Transaction(
+                    row["id"],
+                    row["date"],
+                    row["description"],
+                    row["amount"],
+                    transaction_Type
+                )
+                transactions.append(transaction)
             
             cursor.close()
             connection.close()
             return transactions
             
         except Exception as ex:
-            print(f"Error getting transactions: {ex}")
-            return None
+            print(f"Error con las transacciones: {ex}")
+            return [] 
