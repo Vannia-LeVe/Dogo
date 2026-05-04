@@ -1,0 +1,119 @@
+
+
+<!doctype html>
+<html lang="es">
+    <head> 
+        <meta charset="utf-8" />
+        <title>CheemsBank - Eliminar</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta content="El banco preferido por los mexicanos" name="description" />
+        <meta content="Tu nombre" name="author" />
+ 
+        <link rel="shortcut icon" href="{{ url_for('static',filename='images/site/favicon.png') }}">
+
+        <link href="{{ url_for('static',filename= 'css/bootstrap.min.css') }}" id="bootstrap-style" rel="stylesheet" type="text/css" />
+        <link href="{{ url_for('static',filename= 'css/icons.min.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ url_for('static',filename= 'css/app.min.css') }}" id="app-style" rel="stylesheet" type="text/css" />
+        <script src="{{ url_for('static',filename= 'js/plugin.js') }}"></script>
+    </head>
+
+    <body data-sidebar="dark" data-sidebar-size="small">
+
+        <div id="layout-wrapper">
+
+            <header id="page-topbar">
+                <div class="navbar-header">
+                    <div class="d-flex">
+                        <div class="navbar-brand-box">
+                            <a href="index.html" class="logo logo-light">
+                                <span class="logo-sm">
+                                    <img src="{{ url_for('static',filename='images/site/cheems_bank_logo.png') }}" alt="" height="22">
+                                </span>
+                                <span class="logo-lg">
+                                    <img src="{{ url_for('static',filename='images/site/cheems_bank_logo.png') }}" alt="" height="70" style="margin-top:10px">
+                                </span>
+                            </a>
+                        </div>
+
+                        <button type="button" class="btn btn-sm px-3 font-size-16 header-item waves-effect" id="vertical-menu-btn">
+                            <i class="fa fa-fw fa-bars"></i>
+                        </button>
+                    </div>
+
+                    <div class="d-flex">
+                        <div class="dropdown d-inline-block">
+                            <button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown"
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <img class="rounded-circle header-profile-user" src="{{ url_for('static',filename='images/users/default.png') }}"
+                                    alt="Header Avatar">
+                                <span class="d-none d-xl-inline-block ms-1" key="t-henry">{{ current_user.name }}</span>
+                                <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end">
+                                <a class="dropdown-item" href="{{ url_for('welcome') }}"><i class="bx bx-home font-size-16 align-middle me-1"></i> <span key="t-profile">Inicio</span></a> 
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item text-danger" href="{{ url_for('logout') }}"><i class="bx bx-power-off font-size-16 align-middle me-1 text-danger"></i> <span key="t-logout">Cerrar sesión</span></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- MENÚ LATERAL -->
+            <div class="vertical-menu">
+                <div data-simplebar class="h-100">
+                    <div id="sidebar-menu">
+                        <ul class="metismenu list-unstyled" id="side-menu">
+                            
+                            <li class="menu-title" key="t-menu">Navegación</li>
+                            <li>
+                                <a href="{{ url_for('welcome') }}" class="waves-effect">
+                                    <i class="bx bx-home-circle"></i>
+                                    <span key="t-dashboards">Inicio</span>
+                                </a>
+                            </li>
+
+
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!-- FIN MENÚ LATERAL -->
+
+            <div class="main-content">
+                <div class="page-content">
+                    <div class="container-fluid">
+                        
+                        <!-- TÍTULO -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center">
+                                            <div class="ms-3">
+                                                <span class="text-muted">Panel de</span>
+                                                <h4 class="mb-0">Eliminación de cliemte</h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+    </body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

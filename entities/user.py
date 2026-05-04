@@ -1,26 +1,38 @@
 import pymysql
+from entities.permission import Permission
+from enums.profile_type import ProfileType
 from persistence.db import get_connection
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 
 
-class User(UserMixin): #se esta heredando
-    def __init__(self, id: int, name: str, email: str, password: str):
+class User(UserMixin):
+    def __init__(self, id: int, name: str, email: str, password: str, profile:ProfileType, permissions: list, is_active :bool):
         self.id = id
         self.name = name
         self.email = email
         self.password = password
+        self.profile = profile
+        self.permissions=permissions
+        self.active= is_active  
+    
+    def is_active(self):
+        return self.active
+    def is_admin(self):
+        return self.profile==ProfileType.ADMIN
+    
+    def has_permission(self, permission_value):
+        # Si es admin, tiene todos los permisos
+        if self.is_admin():
+            return True
+        # Verificar su lista de permisos
+        for perm in self.permissions:
+            if perm.value == permission_value:
+                return True
+        return False
         
+    
     def check_email_exists(email) -> bool:
-        """
-            Verifica si la cuenta de correo electrónico ya se encuentra registrada.
-
-            Parameters:
-                email (str): Correo electrónico a validar.
-
-            Returns:
-                bool: True si el correo ya se encunetra registrado; de lo contrario, False.
-        """
         connection = get_connection()
         cursor = connection.cursor(pymysql.cursors.DictCursor)
         sql = "SELECT email from user WHERE email = %s"
@@ -34,24 +46,13 @@ class User(UserMixin): #se esta heredando
     
         
     def save(name: str, email:str, password:str) -> bool:
-        """
-            Guarda un registro de usuario en la base de datos
-
-            Parameters:
-                name (str): Nombre del usuario.
-                email (str): Correo electrónico del usuario.
-                password (str): Contraseña del usuario en texto plano.
-
-            Returns:
-                bool: True si la cuenta se guardó correctamente; de lo contrario, False.
-        """
         try:
             connection = get_connection()
             cursor = connection.cursor()
             hash_password = generate_password_hash(password)
 
-            sql = "INSERT INTO user (name, email, password) VALUES (%s, %s, %s)"
-            cursor.execute(sql, (name, email, hash_password))
+            sql = "INSERT INTO user (name, email, password, profile, is_active) VALUES (%s, %s, %s, %s, %s)"
+            cursor.execute(sql, (name, email, hash_password, 2, True))
             connection.commit()
 
             cursor.close()
@@ -66,8 +67,7 @@ class User(UserMixin): #se esta heredando
             connection = get_connection()
             cursor = connection.cursor(pymysql.cursors.DictCursor)
             
-
-            sql = "SELECT id, name, email, password FROM user WHERE email = %s"
+            sql = "SELECT id, name, email, password, profile, is_active FROM user WHERE email = %s"
             cursor.execute(sql, (email,))
 
             user = cursor.fetchone()
@@ -75,41 +75,76 @@ class User(UserMixin): #se esta heredando
             cursor.close()
             connection.close()
 
-            if user and check_password_hash(user["password"], password):
+            if user and check_password_hash(user['password'], password):
+                permissions = Permission.get_permission_by_user(user["id"])
+                profile_type = ProfileType(int(user["profile"]))
+                
+                # CORRECCIÓN: Definir is_active con un valor por defecto
+                is_active = False  # Valor por defecto
+                if user["is_active"] is not None:
+                    if isinstance(user["is_active"], bytes):
+                        is_active = user["is_active"] == b'\x01'
+                    elif isinstance(user["is_active"], bool):
+                        is_active = user["is_active"]
+                    else:
+                        is_active = bool(user["is_active"])
+                
+                # CORRECCIÓN: Crear el objeto User fuera del bloque if
                 return User(
                     user["id"],
                     user["name"],
                     user["email"],
-                    ""
+                    user["password"],
+                    profile_type,
+                    permissions,
+                    is_active
                 )
 
             return None
         except Exception as ex:
             print(f"Error login user:{ex}")
-            return False
+            return None
         
     def get_by_id(id):
-            try:
-                connection = get_connection()
-                cursor = connection.cursor(pymysql.cursors.DictCursor)
+        try:
+            connection = get_connection()
+            cursor = connection.cursor(pymysql.cursors.DictCursor)
+            
+            # CORRECCIÓN: Agregar profile e is_active a la consulta SQL
+            sql = "SELECT id, name, email, password, profile, is_active FROM user WHERE id = %s"
+            cursor.execute(sql, (id,))
+
+            user = cursor.fetchone()
+            
+            cursor.close()
+            connection.close()
+
+            if user:
+                profile = ProfileType(int(user["profile"]))
+                permission = Permission.get_permission_by_user(user["id"])
+
+                # CORRECCIÓN: Definir is_active con un valor por defecto
+                is_active = False  # Valor por defecto
+                if user["is_active"] is not None:
+                    if isinstance(user["is_active"], bytes):
+                        is_active = user["is_active"] == b'\x01'
+                    elif isinstance(user["is_active"], bool):
+                        is_active = user["is_active"]
+                    else:
+                        is_active = bool(user["is_active"])
                 
-                sql = "SELECT id, name, email, password FROM user WHERE id = %s"
-                cursor.execute(sql, (id,))
+                return User(
+                    user["id"],
+                    user["name"],
+                    user["email"],
+                    user["password"],
+                    profile,
+                    permission,
+                    is_active
+                )
 
-                user = cursor.fetchone()
-                
-                cursor.close()
-                connection.close()
-
-                if user:
-                    return User(
-                        user["id"],
-                        user["name"],
-                        user["email"],
-                        user["password"]
-                    )
-
-                return None
-            except Exception as ex:
-                print(f"Error login user:{ex}")
-                return False
+            return None
+        except Exception as ex:
+            print(f"Error login user:{ex}")
+            return None
+    

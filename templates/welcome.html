@@ -23,7 +23,6 @@
                 <div class="navbar-header">
                     <div class="d-flex">
                         <div class="navbar-brand-box">
-
                             <a href="index.html" class="logo logo-light">
                                 <span class="logo-sm">
                                     <img src="{{ url_for('static',filename='images/site/cheems_bank_logo.png') }}" alt="" height="22">
@@ -55,46 +54,81 @@
                                 <a class="dropdown-item text-danger" href="{{ url_for('logout') }}"><i class="bx bx-power-off font-size-16 align-middle me-1 text-danger"></i> <span key="t-logout">Cerrar sesión</span></a>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </header>
+                            <!-- MENÚ LATERAL -->
+                            <div class="vertical-menu">
+                                <div data-simplebar class="h-100">
+                                    <div id="sidebar-menu">
+                                        <ul class="metismenu list-unstyled" id="side-menu">
+                                            
+                                            <li class="menu-title" key="t-menu">Mi Cuenta</li>
+                                            <li>
+                                                <a href="{{ url_for('welcome') }}" class="waves-effect">
+                                                    <i class="bx bx-home-circle"></i>
+                                                    <span key="t-dashboards">Inicio</span>
+                                                </a>
+                                            </li>
 
-            <div class="vertical-menu">
-                <div data-simplebar class="h-100">
-                    <div id="sidebar-menu">
-                        <ul class="metismenu list-unstyled" id="side-menu">
-                            <li class="menu-title" key="t-menu">Categoría 1</li>
-                            <li>
-                                <a href="javascript: void(0);" class="has-arrow waves-effect">
-                                    <i class="bx bx-home-circle"></i>
-                                    <span key="t-dashboards">Inicio</span>
-                                </a>
-                                <ul class="sub-menu" aria-expanded="false">
-                                    <li><a href="#" key="t-default">Opción 1</a></li>
-                                    <li><a href="#" key="t-saas">Opción 2</a></li>
-                                    <li><a href="#" key="t-crypto">Opción 3</a></li>
-                                </ul>
-                            </li>
+                                            <!-- SOLO ADMIN -->
+                                            {% if current_user.is_admin() %}
+                                            <li class="menu-title" key="t-admin">Administración</li>
+                                            <li>
+                                                <a href="{{ url_for('admin_panel') }}" class="waves-effect">
+                                                    <i class="bx bx-shield"></i>
+                                                    <span key="t-admin">Panel Admin</span>
+                                                </a>
+                                            </li>
+                                            {% endif %}
 
-                            <li class="menu-title" key="t-apps">Categoría 2</li>
+                                            <!-- PERMISOS ESPECIALES (para admin y clientes con permisos) -->
+                                            {% if current_user.has_permission(ValuePermission.CUSTOMER_EDIT) or 
+                                                current_user.has_permission(ValuePermission.CUSTOMER_DELETE) or 
+                                                current_user.has_permission(ValuePermission.ACCOUNT) or 
+                                                current_user.has_permission(ValuePermission.TRANSACTION_COMMIT) %}
+                                            <li class="menu-title" key="t-permisos">Permisos</li>
+                                            {% endif %}
 
-                            <li>
-                                <a href="javascript: void(0);" class="has-arrow waves-effect">
-                                    <i class="bx bx-calendar"></i>
-                                    <span key="t-dashboards">Menú 1</span>
-                                </a>
-                                <ul class="sub-menu" aria-expanded="false">
-                                    <li><a href="#" key="t-tui-calendar">Opción 1</a></li>
-                                    <li><a href="#" key="t-full-calendar">Opción 2</a></li>
-                                </ul>
-                            </li>
-                            <li>
-                                <a href="#" class="waves-effect">
-                                    <i class="bx bx-chat"></i>
-                                    <span key="t-chat">Menú 2</span>
-                                </a>
-                            </li>
+                                            {% if current_user.has_permission(ValuePermission.CUSTOMER_EDIT) %}
+                                            <li>
+                                                <a href="{{ url_for('customer_edit_panel') }}" class="waves-effect">
+                                                    <i class="bx bx-edit"></i>
+                                                    <span>Editar Clientes</span>
+                                                </a>
+                                            </li>
+                                            {% endif %}
+
+                                            {% if current_user.has_permission(ValuePermission.CUSTOMER_DELETE) %}
+                                            <li>
+                                                <a href="{{ url_for('customer_delete_panel') }}" class="waves-effect">
+                                                    <i class="bx bx-trash"></i>
+                                                    <span>Eliminar Clientes</span>
+                                                </a>
+                                            </li>
+                                            {% endif %}
+
+                                            {% if current_user.has_permission(ValuePermission.ACCOUNT) %}
+                                            <li>
+                                                <a href="{{ url_for('account_manage_panel') }}" class="waves-effect">
+                                                    <i class="bx bx-credit-card"></i>
+                                                    <span>Gestionar Cuentas</span>
+                                                </a>
+                                            </li>
+                                            {% endif %}
+
+                                            {% if current_user.has_permission(ValuePermission.TRANSACTION_COMMIT) %}
+                                            <li>
+                                                <a href="{{ url_for('transaction_commit_panel') }}" class="waves-effect">
+                                                    <i class="bx bx-transfer"></i>
+                                                    <span>Transacciones</span>
+                                                </a>
+                                            </li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
                         </ul>
                     </div>
                 </div>
@@ -103,6 +137,8 @@
             <div class="main-content">
                 <div class="page-content">
                     <div class="container-fluid">
+                        
+                        <!-- TARJETA DE BIENVENIDA -->
                         <div class="row">
                             <div class="col-12">
                                 <div class="card">
@@ -113,14 +149,12 @@
                                                 <div class="d-flex align-items-center">
                                                     <img class="rounded-circle" src="{{ url_for('static',filename='images/users/default.png') }}" width="70" height="70" style="object-fit: cover; border: 2px solid #e9ecef;">
                                                     <div class="ms-3">
-                                                        <span class="text-muted">Bienvenido,</span>
+                                                        <span class="text-muted">Bienvenido{% if current_user.is_admin() %} Admin{% endif %},</span>
                                                         <h4 class="mb-0">{{ current_user.name }}</h4>
-                                                        
                                                     </div>
                                                 </div>
                                             </div>
                                             
-                                            <!-- Número de cuenta -->
                                             <div class="col-md-4">
                                                 <div class="border-start border-end px-4 text-center">
                                                     <h5 class="mb-0 mt-1">{{ account.number }}</h5>
@@ -128,11 +162,10 @@
                                                 </div>
                                             </div>
                                             
-                                            <!-- Saldo -->
                                             <div class="col-md-3 text-end">
                                                 <div class="px-3">
                                                     <small class="text-muted">Saldo actual</small>
-                                                    <h3  "font color="#0a2642">${{ "%.2f"|format(balance) }}</h3>
+                                                    <h3 style="color: #0a2642;">${{ "%.2f"|format(balance) }}</h3>
                                                 </div>
                                             </div>
                                         </div>
@@ -140,49 +173,52 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- TABLA DE MOVIMIENTOS -->
                         <div class="row">
                             <div class="col-12">
                                 <div class="table-responsive">
                                     <h5>Movimientos</h5>
                                     <table class="table table-hover">
                                         <thead>
-                                            
+                                            <tr>
                                                 <th width="20%"><font color="#34495e">Fecha</font></th>
                                                 <th width="30%"><font color="#34495e">Descripción</font></th>
                                                 <th width="25%"><font color="#34495e">Monto</font></th>
                                                 <th width="25%"><font color="#34495e">Tipo</font></th>
-                                            
+                                            </tr>
                                         </thead>
                                         <tbody>
-                                        {% for t in account.transactions %}
-                                        <tr>
-                                            <td>
-                                                {% if t.date %}
-                                                    {% if t.date.strftime is defined %}
-                                                        {{ t.date.strftime('%d/%m/%Y %H:%M') }}
+                                        {% if account and account.transactions %}
+                                            {% for t in account.transactions %}
+                                            <tr>
+                                                <td>
+                                                    {% if t.date %}
+                                                        {% if t.date.strftime is defined %}
+                                                            {{ t.date.strftime('%d/%m/%Y %H:%M') }}
+                                                        {% else %}
+                                                            {{ t.date }}
+                                                        {% endif %}
                                                     {% else %}
-                                                        {{ t.date }}
+                                                        N/A
                                                     {% endif %}
-                                                {% else %}
-                                                    N/A
+                                                </td>
+                                                <td>{{ t.description }}</td>
+                                                
+                                                {% if t.type.value == 1 %}
+                                                    <td style="color: green;">+${{ "%.2f"|format(t.amount) }}</td>
+                                                    <td>Ingreso</td>
+                                                {% elif t.type.value == 2 %}
+                                                    <td style="color: red;">-${{ "%.2f"|format(t.amount) }}</td>
+                                                    <td>Egreso</td>
                                                 {% endif %}
-                                            </td>
-                                            <td>{{ t.description }}</td>
-                                            
-                                            {% if t.type.value == 1 %}
-                                                <td>+${{ (t.amount) }}</td>
-                                                <td>Ingreso</td>
-                                            {% elif t.type.value == 2 %}
-                                                <td>-${{(t.amount) }}</td>
-                                                <td>Egreso</td>
-                                            {% endif %}
-                                        </tr>
-                                            {% else %}
-                                        <tr>
-                                            <td colspan="4" align="center">No hay movimientos</td>
-                                        </tr>
+                                            </tr>
                                             {% endfor %}
-
+                                        {% else %}
+                                            <tr>
+                                                <td colspan="4" align="center">No hay movimientos</td>
+                                            </tr>
+                                        {% endif %}
                                         </tbody>
                                     </table>
                                 </div>

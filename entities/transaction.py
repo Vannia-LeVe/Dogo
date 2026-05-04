@@ -16,6 +16,7 @@ class Transaction:
             connection = get_connection()
             cursor = connection.cursor(pymysql.cursors.DictCursor)
             sql = "SELECT id, amount , description,date, type FROM transaction WHERE id_account = %s "
+            # hacer un join para la tabla y poder tener permission 
             cursor.execute(sql, (id_account,)) 
             
             
@@ -41,3 +42,26 @@ class Transaction:
         except Exception as ex:
             print(f"Error con las transacciones: {ex}")
             return [] 
+    def get_by_user(id_user: int):
+        """Obtener todas las transacciones de un usuario"""
+        try:
+            connection = get_connection()
+            cursor = connection.cursor(pymysql.cursors.DictCursor)
+            
+            # Primero obtener la cuenta del usuario
+            sql_account = "SELECT id FROM account WHERE id_user = %s"
+            cursor.execute(sql_account, (id_user,))
+            account = cursor.fetchone()
+            
+            cursor.close()
+            connection.close()
+            
+            if not account:
+                return []
+            
+            # Obtener las transacciones de esa cuenta
+            return Transaction.get_transaction_by_account(account['id'])
+            
+        except Exception as ex:
+            print(f"Error getting transactions by user: {ex}")
+            return []
